@@ -185,12 +185,12 @@ class NeRF(nn.Module):
                  skips=[4],
                  use_viewdirs=False):
         super(NeRF, self).__init__()
-        self.D = D
-        self.W = W
-        self.d_in = d_in
-        self.d_in_view = d_in_view
-        self.input_ch = 3
-        self.input_ch_view = 3
+        self.D = int(D)
+        self.W = int(W)
+        self.d_in = int(d_in)
+        self.d_in_view = int(d_in_view)
+        self.input_ch = int(3)
+        self.input_ch_view = int(3)
         self.embed_fn = None
         self.embed_fn_view = None
 
