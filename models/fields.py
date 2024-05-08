@@ -194,7 +194,7 @@ class NeRF(nn.Module):
         self.embed_fn = None
         self.embed_fn_view = None
 
-        if multires > 0:
+        if multires > 0: # multires is abbreviation for "multi-resolution"
             embed_fn, input_ch = get_embedder(multires, input_dims=d_in)
             self.embed_fn = embed_fn
             self.input_ch = input_ch
