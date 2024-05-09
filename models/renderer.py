@@ -293,8 +293,8 @@ class NeuSRenderer:
         if self.n_outside > 0:
             z_vals_outside = torch.linspace(1e-3, 1.0 - 1.0 / (self.n_outside + 1.0), self.n_outside)
 
-        print(z_vals_outside.shape)
-        print(z_vals.shape)
+        # print(z_vals_outside.shape) # torch.Size([32])
+        # print(z_vals.shape) # torch.Size([512, 64])
 
         n_samples = self.n_samples
         perturb = self.perturb
@@ -314,6 +314,7 @@ class NeuSRenderer:
 
         if self.n_outside > 0:
             z_vals_outside = far / torch.flip(z_vals_outside, dims=[-1]) + 1.0 / self.n_samples
+        print(z_vals_outside.shape) # torch.Size([512, 32])
 
         background_alpha = None
         background_sampled_color = None
@@ -322,7 +323,9 @@ class NeuSRenderer:
         if self.n_importance > 0:
             with torch.no_grad():
                 pts = rays_o[:, None, :] + rays_d[:, None, :] * z_vals[..., :, None]
+                # print(pts.shape) # torch.Size([512, 64, 3])
                 sdf = self.sdf_network.sdf(pts.reshape(-1, 3)).reshape(batch_size, self.n_samples)
+                # print(sdf.shape) # torch.Size([512, 64])
 
                 for i in range(self.up_sample_steps):
                     new_z_vals = self.up_sample(rays_o,
@@ -331,12 +334,15 @@ class NeuSRenderer:
                                                 sdf,
                                                 self.n_importance // self.up_sample_steps,
                                                 64 * 2**i)
+                    # print(new_z_vals.shape) # in 1st iteration: torch.Size([512, 16])
                     z_vals, sdf = self.cat_z_vals(rays_o,
                                                   rays_d,
                                                   z_vals,
                                                   new_z_vals,
                                                   sdf,
                                                   last=(i + 1 == self.up_sample_steps))
+                    # print(z_vals.shape) # in 1st iteration: torch.Size([512, 80])
+                    # print(sdf.shape) # in 1st iteration: torch.Size([512, 80])
 
             n_samples = self.n_samples + self.n_importance
 
